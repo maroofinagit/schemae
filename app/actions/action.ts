@@ -3,9 +3,8 @@ import { db } from "@/app/lib/db";
 import { auth } from "../lib/auth";
 import { headers } from "next/headers";
 import { cacheLife, updateTag, cacheTag, revalidatePath } from "next/cache";
-import { u } from "framer-motion/client";
-import { use } from "react";
 import { Resend } from "resend";
+import { NotificationType } from "@/generated/prisma/enums";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -793,8 +792,8 @@ export async function completeRoadmapTask(taskId: number, user_exam_id: number, 
                     user_id: userId,
                     roadmap_id: roadmapId,
                     user_exam_id: userExamId,
-                    message: `🎉 Test for Week ${weekNumber} of ${userExamName} is been unlocked !`,
-                    is_read: false,
+                    message: `Test for Week ${weekNumber} of ${userExamName} is been unlocked !`,
+                    type: NotificationType.TEST,
                 },
             });
             notifications.push(weekTestNotification.message);
@@ -807,8 +806,8 @@ export async function completeRoadmapTask(taskId: number, user_exam_id: number, 
                     user_id: userId,
                     roadmap_id: roadmapId,
                     user_exam_id: userExamId,
-                    message: `🎉 Test for Phase ${phaseName} of ${userExamName} is been unlocked !`,
-                    is_read: false,
+                    message: `Test for Phase ${phaseName} of ${userExamName} is been unlocked !`,
+                    type: NotificationType.TEST,
                 },
             });
             notifications.push(phaseTestNotification.message);
@@ -821,8 +820,8 @@ export async function completeRoadmapTask(taskId: number, user_exam_id: number, 
                     user_id: userId,
                     roadmap_id: roadmapId,
                     user_exam_id: userExamId,
-                    message: `🎉 Final tests for ${userExamName} is been unlocked !`,
-                    is_read: false,
+                    message: `Final tests for ${userExamName} is been unlocked !`,
+                    type: NotificationType.TEST,
                 },
             });
             notifications.push(finalTestNotification.message);
@@ -1314,6 +1313,7 @@ export async function getProfileData(userId: string) {
                         message: true,
                         created_at: true,
                         is_read: true,
+                        type: true,
                     },
                 },
             },
@@ -1323,6 +1323,53 @@ export async function getProfileData(userId: string) {
     } catch (error) {
         console.error("❌ Error fetching profile data:", error);
         return null;
+    }
+}
+
+export async function deleteAccount() {
+    try {
+
+        const session = await auth.api.getSession({
+            headers: await headers(),
+        });
+
+        if (!session?.session) {
+            return {
+                success: false,
+                message: "Unauthorized",
+            };
+        }
+
+        const userId = session.session.userId;
+
+        // delete user
+        await db.user.delete({
+            where: {
+                id: userId,
+            },
+        });
+
+        // sign out
+        await auth.api.signOut({
+            headers: await headers(),
+        });
+
+        return {
+            success: true,
+            message: "Account deleted successfully",
+        };
+
+    } catch (error) {
+
+        console.error(
+            "Delete account error:",
+            error
+        );
+
+        return {
+            success: false,
+            message: "Something went wrong",
+        };
     }
 }
 

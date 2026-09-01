@@ -1,8 +1,46 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "./ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+
+import { sendAdminNotification } from "@/app/actions/admin";
+import { useState } from "react";
+import { toast } from "sonner";
+
 
 export default function AdminClient({ data }: any) {
+    const [notificationDialogOpen, setNotificationDialogOpen] =
+        useState(false);
+
+    const [message, setMessage] = useState("");
+    const [isPending, setIsPending] = useState(false);
+
+    const handleSendNotification = async () => {
+        setIsPending(true);
+
+        if (!message.trim()) return;
+
+        const result = await sendAdminNotification(message);
+
+        if (result.success) {
+            setMessage("");
+            setNotificationDialogOpen(false);
+            toast.success("Notification sent successfully!");
+        } else {
+            console.error(result.error);
+            toast.error("Failed to send notification.");
+        }
+        setIsPending(false);
+    };
+
     return (
         <div className="p-6 bg-gray-50 min-h-screen pt-32 md:px-12 px-6">
 
@@ -37,9 +75,107 @@ export default function AdminClient({ data }: any) {
                 </div>
             </div>
 
-            <Link href="/admin/sendBulkEmail" className="inline-block mb-6 px-4 py-2 bg-black text-white rounded-lg">
-                ✉️ Send Bulk Email
-            </Link>
+            <div className="flex items-center gap-3 mb-6">
+                <Link
+                    href="/admin/sendBulkEmail"
+                    className="inline-block px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 cursor-pointer text-sm"
+                >
+                    ✉️ Send Bulk Email
+                </Link>
+
+                <Button
+                    onClick={() => setNotificationDialogOpen(true)}
+                    className="bg-black text-white hover:bg-gray-800 cursor-pointer"
+                >
+                    🔔 Send Notification
+                </Button>
+            </div>
+
+            <Dialog
+                open={notificationDialogOpen}
+                onOpenChange={setNotificationDialogOpen}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Send Notification
+                        </DialogTitle>
+
+                        <DialogDescription>
+                            This notification will be sent to all users.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <label
+                                htmlFor="notification"
+                                className="text-sm font-medium text-foreground"
+                            >
+                                Notification
+                            </label>
+
+                            <span className="text-xs text-muted-foreground">
+                                {message.length}/100
+                            </span>
+                        </div>
+
+                        <div className="relative">
+                            <textarea
+                                id="notification"
+                                rows={2}
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="Write a short notification for your users..."
+                                maxLength={100}
+                                className="
+                w-full
+                resize-none
+                rounded-xl
+                border border-border
+                bg-muted/30
+                px-4 py-3
+                text-sm
+                text-foreground
+                placeholder:text-muted-foreground
+                outline-none
+                transition-all duration-200
+                focus:border-foreground/30
+                focus:bg-background
+                focus:ring-2
+                focus:ring-foreground/10
+            "
+                            />
+                        </div>
+
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() =>
+                                setNotificationDialogOpen(false)
+                            }
+                            disabled={isPending}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            onClick={handleSendNotification}
+                            disabled={
+                                isPending || !message.trim()
+                            }
+                            className="bg-black text-white hover:bg-green-700 cursor-pointer"
+                        >
+                            {isPending
+                                ? "Sending..."
+                                : "Send Notification"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
 
             {/* 📋 USERS TABLE */}
             <div className="bg-white shadow-sm rounded-xl border overflow-hidden">

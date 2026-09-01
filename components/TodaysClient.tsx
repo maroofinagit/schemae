@@ -399,7 +399,7 @@ export default function TodaysClient({ todaysTasks }: { todaysTasks: any[] }) {
                                     key={group.examId}
                                     initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: false, amount: 0.5 }}
+                                    viewport={{ once: false, amount: 0.2 }}
                                     transition={{ duration: 0.4 }}
                                 >
 
@@ -551,7 +551,7 @@ export default function TodaysClient({ todaysTasks }: { todaysTasks: any[] }) {
                                     key={group.examId}
                                     initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: false, amount: 0.5 }}
+                                    viewport={{ once: false, amount: 0.1 }}
                                     transition={{ duration: 0.4 }}
                                 >
 
@@ -718,7 +718,7 @@ export default function TodaysClient({ todaysTasks }: { todaysTasks: any[] }) {
                                 key={group.examId}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: false, amount: 0.5 }}
+                                viewport={{ once: false, amount: 0.2 }}
                                 transition={{ duration: 0.4 }}
                             >
 

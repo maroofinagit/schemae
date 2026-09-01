@@ -7,6 +7,7 @@ import { RoadmapSchema } from "@/app/lib/zodSchema";
 import { i } from "framer-motion/client";
 import { Prisma } from "@/generated/prisma/client";
 import { error } from "next/dist/build/output/log";
+import { NotificationType } from "@/generated/prisma/enums";
 
 const ai = new GoogleGenAI({});
 
@@ -916,6 +917,7 @@ Do NOT
                 message: `Your roadmap for ${exam.name} has been generated successfully!`,
                 user_exam_id: user_exam_id,
                 roadmap_id: roadmap.id,
+                type:NotificationType.ROADMAP,
             },
         });
 

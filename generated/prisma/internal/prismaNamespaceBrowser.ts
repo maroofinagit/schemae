@@ -332,7 +332,8 @@ export const NotificationScalarFieldEnum = {
   user_exam_id: 'user_exam_id',
   message: 'message',
   is_read: 'is_read',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  type: 'type'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]

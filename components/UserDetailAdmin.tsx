@@ -3,8 +3,45 @@
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { sendNotificationToUser } from "@/app/actions/admin";
 
 export default function UserDetailClient({ user }: any) {
+
+    const [notificationDialogOpen, setNotificationDialogOpen] =
+        useState(false);
+
+    const [message, setMessage] = useState("");
+    const [isPending, setIsPending] = useState(false);
+
+    const handleSendNotification = async () => {
+        setIsPending(true);
+
+        if (!message.trim()) return;
+
+        const result = await sendNotificationToUser(user.id, message);
+
+        if (result.success) {
+            setMessage("");
+            setNotificationDialogOpen(false);
+            toast.success("Notification sent successfully!");
+        } else {
+            console.error(result.error);
+            toast.error("Failed to send notification.");
+        }
+        setIsPending(false);
+    };
+
     const router = useRouter();
 
     const totalExams = user.exams.length;
@@ -70,16 +107,112 @@ export default function UserDetailClient({ user }: any) {
 
                         {/* CREATED DATE */}
                         <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
-                            Joined {new Date(user.createdAt).toLocaleDateString()}
+                            Joined {user.createdAt.toLocaleDateString()}
                         </span>
                     </div>
                 </div>
 
-                <Link href={`/admin/sendEmail/${user.id}`} className="ml-auto">
-                    <Button className="hover:bg-black bg-transparent border border-black text-black font-medium hover:text-white cursor-pointer">
+                <div className="flex items-center gap-3 mb-6">
+                    <Link
+                        href={`/admin/sendEmail/${user.id}`}
+                        className="inline-block px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 cursor-pointer text-sm"
+                    >
                         Send Email
+                    </Link>
+
+                    <Button
+                        onClick={() => setNotificationDialogOpen(true)}
+                        className="bg-black text-white hover:bg-gray-800 cursor-pointer"
+                    >
+                        Send Notification
                     </Button>
-                </Link>
+                </div>
+
+                <Dialog
+                    open={notificationDialogOpen}
+                    onOpenChange={setNotificationDialogOpen}
+                >
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                Send Notification
+                            </DialogTitle>
+
+                            <DialogDescription>
+                                This notification will be sent to the {user.name}.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <label
+                                    htmlFor="notification"
+                                    className="text-sm font-medium text-foreground"
+                                >
+                                    Notification
+                                </label>
+
+                                <span className="text-xs text-muted-foreground">
+                                    {message.length}/100
+                                </span>
+                            </div>
+
+                            <div className="relative">
+                                <textarea
+                                    id="notification"
+                                    rows={2}
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Write a short notification for your users..."
+                                    maxLength={100}
+                                    className="
+                w-full
+                resize-none
+                rounded-xl
+                border border-border
+                bg-muted/30
+                px-4 py-3
+                text-sm
+                text-foreground
+                placeholder:text-muted-foreground
+                outline-none
+                transition-all duration-200
+                focus:border-foreground/30
+                focus:bg-background
+                focus:ring-2
+                focus:ring-foreground/10
+            "
+                                />
+                            </div>
+
+                        </div>
+
+                        <DialogFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() =>
+                                    setNotificationDialogOpen(false)
+                                }
+                                disabled={isPending}
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                onClick={handleSendNotification}
+                                disabled={
+                                    isPending || !message.trim()
+                                }
+                                className="bg-black text-white hover:bg-green-700 cursor-pointer"
+                            >
+                                {isPending
+                                    ? "Sending..."
+                                    : "Send Notification"}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
             </div>
 
             {/* 📊 STATS GRID */}

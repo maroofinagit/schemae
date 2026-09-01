@@ -46,6 +46,7 @@ export type NotificationMinAggregateOutputType = {
   message: string | null
   is_read: boolean | null
   created_at: Date | null
+  type: $Enums.NotificationType | null
 }
 
 export type NotificationMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type NotificationMaxAggregateOutputType = {
   message: string | null
   is_read: boolean | null
   created_at: Date | null
+  type: $Enums.NotificationType | null
 }
 
 export type NotificationCountAggregateOutputType = {
@@ -66,6 +68,7 @@ export type NotificationCountAggregateOutputType = {
   message: number
   is_read: number
   created_at: number
+  type: number
   _all: number
 }
 
@@ -90,6 +93,7 @@ export type NotificationMinAggregateInputType = {
   message?: true
   is_read?: true
   created_at?: true
+  type?: true
 }
 
 export type NotificationMaxAggregateInputType = {
@@ -100,6 +104,7 @@ export type NotificationMaxAggregateInputType = {
   message?: true
   is_read?: true
   created_at?: true
+  type?: true
 }
 
 export type NotificationCountAggregateInputType = {
@@ -110,6 +115,7 @@ export type NotificationCountAggregateInputType = {
   message?: true
   is_read?: true
   created_at?: true
+  type?: true
   _all?: true
 }
 
@@ -201,12 +207,13 @@ export type NotificationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type NotificationGroupByOutputType = {
   id: number
-  roadmap_id: number
+  roadmap_id: number | null
   user_id: string
-  user_exam_id: number
+  user_exam_id: number | null
   message: string
   is_read: boolean
   created_at: Date
+  type: $Enums.NotificationType | null
   _count: NotificationCountAggregateOutputType | null
   _avg: NotificationAvgAggregateOutputType | null
   _sum: NotificationSumAggregateOutputType | null
@@ -234,12 +241,13 @@ export type NotificationWhereInput = {
   OR?: Prisma.NotificationWhereInput[]
   NOT?: Prisma.NotificationWhereInput | Prisma.NotificationWhereInput[]
   id?: Prisma.IntFilter<"Notification"> | number
-  roadmap_id?: Prisma.IntFilter<"Notification"> | number
+  roadmap_id?: Prisma.IntNullableFilter<"Notification"> | number | null
   user_id?: Prisma.StringFilter<"Notification"> | string
-  user_exam_id?: Prisma.IntFilter<"Notification"> | number
+  user_exam_id?: Prisma.IntNullableFilter<"Notification"> | number | null
   message?: Prisma.StringFilter<"Notification"> | string
   is_read?: Prisma.BoolFilter<"Notification"> | boolean
   created_at?: Prisma.DateTimeFilter<"Notification"> | Date | string
+  type?: Prisma.EnumNotificationTypeNullableFilter<"Notification"> | $Enums.NotificationType | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   roadmap?: Prisma.XOR<Prisma.RoadmapNullableScalarRelationFilter, Prisma.RoadmapWhereInput> | null
   userExam?: Prisma.XOR<Prisma.UserExamNullableScalarRelationFilter, Prisma.UserExamWhereInput> | null
@@ -247,12 +255,13 @@ export type NotificationWhereInput = {
 
 export type NotificationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  roadmap_id?: Prisma.SortOrder
+  roadmap_id?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
-  user_exam_id?: Prisma.SortOrder
+  user_exam_id?: Prisma.SortOrderInput | Prisma.SortOrder
   message?: Prisma.SortOrder
   is_read?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   roadmap?: Prisma.RoadmapOrderByWithRelationInput
   userExam?: Prisma.UserExamOrderByWithRelationInput
@@ -263,12 +272,13 @@ export type NotificationWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.NotificationWhereInput | Prisma.NotificationWhereInput[]
   OR?: Prisma.NotificationWhereInput[]
   NOT?: Prisma.NotificationWhereInput | Prisma.NotificationWhereInput[]
-  roadmap_id?: Prisma.IntFilter<"Notification"> | number
+  roadmap_id?: Prisma.IntNullableFilter<"Notification"> | number | null
   user_id?: Prisma.StringFilter<"Notification"> | string
-  user_exam_id?: Prisma.IntFilter<"Notification"> | number
+  user_exam_id?: Prisma.IntNullableFilter<"Notification"> | number | null
   message?: Prisma.StringFilter<"Notification"> | string
   is_read?: Prisma.BoolFilter<"Notification"> | boolean
   created_at?: Prisma.DateTimeFilter<"Notification"> | Date | string
+  type?: Prisma.EnumNotificationTypeNullableFilter<"Notification"> | $Enums.NotificationType | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   roadmap?: Prisma.XOR<Prisma.RoadmapNullableScalarRelationFilter, Prisma.RoadmapWhereInput> | null
   userExam?: Prisma.XOR<Prisma.UserExamNullableScalarRelationFilter, Prisma.UserExamWhereInput> | null
@@ -276,12 +286,13 @@ export type NotificationWhereUniqueInput = Prisma.AtLeast<{
 
 export type NotificationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  roadmap_id?: Prisma.SortOrder
+  roadmap_id?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
-  user_exam_id?: Prisma.SortOrder
+  user_exam_id?: Prisma.SortOrderInput | Prisma.SortOrder
   message?: Prisma.SortOrder
   is_read?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.NotificationCountOrderByAggregateInput
   _avg?: Prisma.NotificationAvgOrderByAggregateInput
   _max?: Prisma.NotificationMaxOrderByAggregateInput
@@ -294,18 +305,20 @@ export type NotificationScalarWhereWithAggregatesInput = {
   OR?: Prisma.NotificationScalarWhereWithAggregatesInput[]
   NOT?: Prisma.NotificationScalarWhereWithAggregatesInput | Prisma.NotificationScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Notification"> | number
-  roadmap_id?: Prisma.IntWithAggregatesFilter<"Notification"> | number
+  roadmap_id?: Prisma.IntNullableWithAggregatesFilter<"Notification"> | number | null
   user_id?: Prisma.StringWithAggregatesFilter<"Notification"> | string
-  user_exam_id?: Prisma.IntWithAggregatesFilter<"Notification"> | number
+  user_exam_id?: Prisma.IntNullableWithAggregatesFilter<"Notification"> | number | null
   message?: Prisma.StringWithAggregatesFilter<"Notification"> | string
   is_read?: Prisma.BoolWithAggregatesFilter<"Notification"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Notification"> | Date | string
+  type?: Prisma.EnumNotificationTypeNullableWithAggregatesFilter<"Notification"> | $Enums.NotificationType | null
 }
 
 export type NotificationCreateInput = {
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
   user: Prisma.UserCreateNestedOneWithoutNotificationsInput
   roadmap?: Prisma.RoadmapCreateNestedOneWithoutNotificationsInput
   userExam?: Prisma.UserExamCreateNestedOneWithoutNotificationsInput
@@ -313,18 +326,20 @@ export type NotificationCreateInput = {
 
 export type NotificationUncheckedCreateInput = {
   id?: number
-  roadmap_id: number
+  roadmap_id?: number | null
   user_id: string
-  user_exam_id: number
+  user_exam_id?: number | null
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationUpdateInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
   user?: Prisma.UserUpdateOneRequiredWithoutNotificationsNestedInput
   roadmap?: Prisma.RoadmapUpdateOneWithoutNotificationsNestedInput
   userExam?: Prisma.UserExamUpdateOneWithoutNotificationsNestedInput
@@ -332,38 +347,42 @@ export type NotificationUpdateInput = {
 
 export type NotificationUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  roadmap_id?: Prisma.IntFieldUpdateOperationsInput | number
+  roadmap_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  user_exam_id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_exam_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationCreateManyInput = {
   id?: number
-  roadmap_id: number
+  roadmap_id?: number | null
   user_id: string
-  user_exam_id: number
+  user_exam_id?: number | null
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationUpdateManyMutationInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  roadmap_id?: Prisma.IntFieldUpdateOperationsInput | number
+  roadmap_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  user_exam_id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_exam_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationListRelationFilter = {
@@ -384,6 +403,7 @@ export type NotificationCountOrderByAggregateInput = {
   message?: Prisma.SortOrder
   is_read?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type NotificationAvgOrderByAggregateInput = {
@@ -400,6 +420,7 @@ export type NotificationMaxOrderByAggregateInput = {
   message?: Prisma.SortOrder
   is_read?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type NotificationMinOrderByAggregateInput = {
@@ -410,6 +431,7 @@ export type NotificationMinOrderByAggregateInput = {
   message?: Prisma.SortOrder
   is_read?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type NotificationSumOrderByAggregateInput = {
@@ -544,21 +566,27 @@ export type NotificationUncheckedUpdateManyWithoutRoadmapNestedInput = {
   deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
 }
 
+export type NullableEnumNotificationTypeFieldUpdateOperationsInput = {
+  set?: $Enums.NotificationType | null
+}
+
 export type NotificationCreateWithoutUserInput = {
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
   roadmap?: Prisma.RoadmapCreateNestedOneWithoutNotificationsInput
   userExam?: Prisma.UserExamCreateNestedOneWithoutNotificationsInput
 }
 
 export type NotificationUncheckedCreateWithoutUserInput = {
   id?: number
-  roadmap_id: number
-  user_exam_id: number
+  roadmap_id?: number | null
+  user_exam_id?: number | null
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationCreateOrConnectWithoutUserInput = {
@@ -592,29 +620,32 @@ export type NotificationScalarWhereInput = {
   OR?: Prisma.NotificationScalarWhereInput[]
   NOT?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
   id?: Prisma.IntFilter<"Notification"> | number
-  roadmap_id?: Prisma.IntFilter<"Notification"> | number
+  roadmap_id?: Prisma.IntNullableFilter<"Notification"> | number | null
   user_id?: Prisma.StringFilter<"Notification"> | string
-  user_exam_id?: Prisma.IntFilter<"Notification"> | number
+  user_exam_id?: Prisma.IntNullableFilter<"Notification"> | number | null
   message?: Prisma.StringFilter<"Notification"> | string
   is_read?: Prisma.BoolFilter<"Notification"> | boolean
   created_at?: Prisma.DateTimeFilter<"Notification"> | Date | string
+  type?: Prisma.EnumNotificationTypeNullableFilter<"Notification"> | $Enums.NotificationType | null
 }
 
 export type NotificationCreateWithoutUserExamInput = {
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
   user: Prisma.UserCreateNestedOneWithoutNotificationsInput
   roadmap?: Prisma.RoadmapCreateNestedOneWithoutNotificationsInput
 }
 
 export type NotificationUncheckedCreateWithoutUserExamInput = {
   id?: number
-  roadmap_id: number
+  roadmap_id?: number | null
   user_id: string
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationCreateOrConnectWithoutUserExamInput = {
@@ -647,6 +678,7 @@ export type NotificationCreateWithoutRoadmapInput = {
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
   user: Prisma.UserCreateNestedOneWithoutNotificationsInput
   userExam?: Prisma.UserExamCreateNestedOneWithoutNotificationsInput
 }
@@ -654,10 +686,11 @@ export type NotificationCreateWithoutRoadmapInput = {
 export type NotificationUncheckedCreateWithoutRoadmapInput = {
   id?: number
   user_id: string
-  user_exam_id: number
+  user_exam_id?: number | null
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationCreateOrConnectWithoutRoadmapInput = {
@@ -688,87 +721,97 @@ export type NotificationUpdateManyWithWhereWithoutRoadmapInput = {
 
 export type NotificationCreateManyUserInput = {
   id?: number
-  roadmap_id: number
-  user_exam_id: number
+  roadmap_id?: number | null
+  user_exam_id?: number | null
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationUpdateWithoutUserInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
   roadmap?: Prisma.RoadmapUpdateOneWithoutNotificationsNestedInput
   userExam?: Prisma.UserExamUpdateOneWithoutNotificationsNestedInput
 }
 
 export type NotificationUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  roadmap_id?: Prisma.IntFieldUpdateOperationsInput | number
-  user_exam_id?: Prisma.IntFieldUpdateOperationsInput | number
+  roadmap_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  user_exam_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  roadmap_id?: Prisma.IntFieldUpdateOperationsInput | number
-  user_exam_id?: Prisma.IntFieldUpdateOperationsInput | number
+  roadmap_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  user_exam_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationCreateManyUserExamInput = {
   id?: number
-  roadmap_id: number
+  roadmap_id?: number | null
   user_id: string
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationUpdateWithoutUserExamInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
   user?: Prisma.UserUpdateOneRequiredWithoutNotificationsNestedInput
   roadmap?: Prisma.RoadmapUpdateOneWithoutNotificationsNestedInput
 }
 
 export type NotificationUncheckedUpdateWithoutUserExamInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  roadmap_id?: Prisma.IntFieldUpdateOperationsInput | number
+  roadmap_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationUncheckedUpdateManyWithoutUserExamInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  roadmap_id?: Prisma.IntFieldUpdateOperationsInput | number
+  roadmap_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationCreateManyRoadmapInput = {
   id?: number
   user_id: string
-  user_exam_id: number
+  user_exam_id?: number | null
   message: string
   is_read?: boolean
   created_at?: Date | string
+  type?: $Enums.NotificationType | null
 }
 
 export type NotificationUpdateWithoutRoadmapInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
   user?: Prisma.UserUpdateOneRequiredWithoutNotificationsNestedInput
   userExam?: Prisma.UserExamUpdateOneWithoutNotificationsNestedInput
 }
@@ -776,19 +819,21 @@ export type NotificationUpdateWithoutRoadmapInput = {
 export type NotificationUncheckedUpdateWithoutRoadmapInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  user_exam_id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_exam_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 export type NotificationUncheckedUpdateManyWithoutRoadmapInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   user_id?: Prisma.StringFieldUpdateOperationsInput | string
-  user_exam_id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_exam_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   message?: Prisma.StringFieldUpdateOperationsInput | string
   is_read?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  type?: Prisma.NullableEnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType | null
 }
 
 
@@ -801,6 +846,7 @@ export type NotificationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   message?: boolean
   is_read?: boolean
   created_at?: boolean
+  type?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   roadmap?: boolean | Prisma.Notification$roadmapArgs<ExtArgs>
   userExam?: boolean | Prisma.Notification$userExamArgs<ExtArgs>
@@ -814,6 +860,7 @@ export type NotificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   message?: boolean
   is_read?: boolean
   created_at?: boolean
+  type?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   roadmap?: boolean | Prisma.Notification$roadmapArgs<ExtArgs>
   userExam?: boolean | Prisma.Notification$userExamArgs<ExtArgs>
@@ -827,6 +874,7 @@ export type NotificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   message?: boolean
   is_read?: boolean
   created_at?: boolean
+  type?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   roadmap?: boolean | Prisma.Notification$roadmapArgs<ExtArgs>
   userExam?: boolean | Prisma.Notification$userExamArgs<ExtArgs>
@@ -840,9 +888,10 @@ export type NotificationSelectScalar = {
   message?: boolean
   is_read?: boolean
   created_at?: boolean
+  type?: boolean
 }
 
-export type NotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "roadmap_id" | "user_id" | "user_exam_id" | "message" | "is_read" | "created_at", ExtArgs["result"]["notification"]>
+export type NotificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "roadmap_id" | "user_id" | "user_exam_id" | "message" | "is_read" | "created_at" | "type", ExtArgs["result"]["notification"]>
 export type NotificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   roadmap?: boolean | Prisma.Notification$roadmapArgs<ExtArgs>
@@ -868,12 +917,13 @@ export type $NotificationPayload<ExtArgs extends runtime.Types.Extensions.Intern
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    roadmap_id: number
+    roadmap_id: number | null
     user_id: string
-    user_exam_id: number
+    user_exam_id: number | null
     message: string
     is_read: boolean
     created_at: Date
+    type: $Enums.NotificationType | null
   }, ExtArgs["result"]["notification"]>
   composites: {}
 }
@@ -1307,6 +1357,7 @@ export interface NotificationFieldRefs {
   readonly message: Prisma.FieldRef<"Notification", 'String'>
   readonly is_read: Prisma.FieldRef<"Notification", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"Notification", 'DateTime'>
+  readonly type: Prisma.FieldRef<"Notification", 'NotificationType'>
 }
     
 

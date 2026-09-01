@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { deleteAccount } from "@/app/actions/admin";
+import { deleteAccount } from "@/app/actions/action";
 
 export function DeleteAccountDialog() {
     const [loading, setLoading] = useState(false);

@@ -53,3 +53,15 @@ export const RoadmapStatus = {
 } as const
 
 export type RoadmapStatus = (typeof RoadmapStatus)[keyof typeof RoadmapStatus]
+
+
+export const NotificationType = {
+  ROADMAP: 'ROADMAP',
+  TEST: 'TEST',
+  EXAM: 'EXAM',
+  ACHIEVEMENT: 'ACHIEVEMENT',
+  SYSTEM: 'SYSTEM',
+  ADMIN: 'ADMIN'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

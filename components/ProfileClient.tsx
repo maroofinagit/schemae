@@ -3,7 +3,7 @@
 import { format } from "date-fns";
 import ProfileImageUploader from "@/components/ProfilePicUpdater";
 import { useEffect, useState } from "react";
-import { BellRing, CheckCircle2, ChevronUp, GraduationCap, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ChevronUp, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { markNotificationAsRead, ProfileUserType } from "@/app/actions/action";
 import { toast } from "sonner";
@@ -12,12 +12,36 @@ import { motion } from "framer-motion";
 import { useUser } from "@/app/context/userContext";
 import { playNotification, playError } from "@/app/lib/sound";
 import { Badge } from "./ui/badge";
+import {
+    Map,
+    ClipboardPen,
+    GraduationCap,
+    Trophy,
+    Settings,
+    Megaphone,
+    BellRing,
+} from "lucide-react";
+
+const notificationIcons = {
+    ROADMAP: Map,
+    TEST: ClipboardPen,
+    EXAM: GraduationCap,
+    ACHIEVEMENT: Trophy,
+    SYSTEM: Settings,
+    ADMIN: Megaphone,
+};
 
 export default function ProfilePage({ user }: { user: ProfileUserType }) {
 
     const { soundEnabled } = useUser();
     const [notifications, setNotifications] = useState(user.notifications);
     const [showAllNotifications, setShowAllNotifications] = useState(false);
+
+    const getNotificationIcon = (type: string | null) => {
+        if (!type) return BellRing;
+
+        return notificationIcons[type as keyof typeof notificationIcons] ?? BellRing;
+    };
 
 
     useEffect(() => {
@@ -270,80 +294,11 @@ export default function ProfilePage({ user }: { user: ProfileUserType }) {
                     <div className="space-y-6">
 
                         {/* First two notifications */}
-                        {visibleNotifications.map((n: any, index: number) => (
-                            <motion.div
-                                key={n.id}
-                                initial={{ opacity: 0, x: -20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{
-                                    duration: 0.35,
-                                    delay: index * 0.06,
-                                }}
-                            >
-                                <div
-                                    className={`flex hover:scale-102 items-center gap-5 rounded-2xl border p-5 shadow-sm transition-all duration-300 hover:shadow-lg ${n.is_read
-                                        ? "bg-white border-slate-200"
-                                        : "bg-blue-50 border-blue-200 border-l-4 border-l-blue-600"
-                                        }`}
-                                >
-                                    <div className="flex md:p-4 p-2 items-center justify-center rounded-md md:rounded-xl bg-blue-100">
-                                        <BellRing className="size-4 md:size-6 text-blue-600" />
-                                    </div>
+                        {visibleNotifications.map((n: any, index: number) => {
+                            const IconComponent = getNotificationIcon(n.type);
 
-                                    <div className="flex-1">
-                                        <p className="font-medium text-xs md:text-base text-slate-800">
-                                            {n.message}
-                                        </p>
+                            return (
 
-                                        <p className="mt-2 flex gap-2 text-xs md:text-sm text-slate-500">
-                                            <span>
-
-                                                {format(
-                                                    new Date(n.created_at),
-                                                    "dd MMM yyyy"
-                                                )}
-                                            </span>
-                                            <span>
-
-                                                {
-                                                    format(
-                                                        new Date(n.created_at),
-                                                        "hh:mm a"
-                                                    )
-                                                }
-                                            </span>
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center">
-                                        {n.is_read ? (
-                                            <div className="flex items-center gap-2 text-green-600">
-                                                <CheckCircle2 className="size-5 md:size-6" />
-                                                <span className="hidden md:block text-sm font-medium">
-                                                    Read
-                                                </span>
-                                            </div>
-                                        ) : (
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="cursor-pointer hover:bg-blue-600 hover:text-white"
-                                                onClick={() =>
-                                                    handleNotification(n.id)
-                                                }
-                                            >
-                                                Mark as Read
-                                            </Button>
-                                        )}
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-
-                        {/* Remaining notifications */}
-                        {showAllNotifications &&
-                            remainingNotifications.map((n: any, index: number) => (
                                 <motion.div
                                     key={n.id}
                                     initial={{ opacity: 0, x: -20 }}
@@ -361,7 +316,7 @@ export default function ProfilePage({ user }: { user: ProfileUserType }) {
                                             }`}
                                     >
                                         <div className="flex md:p-4 p-2 items-center justify-center rounded-md md:rounded-xl bg-blue-100">
-                                            <BellRing className="size-4 md:size-6 text-blue-600" />
+                                            <IconComponent className="size-4 md:size-6 text-blue-600" />
                                         </div>
 
                                         <div className="flex-1">
@@ -412,7 +367,85 @@ export default function ProfilePage({ user }: { user: ProfileUserType }) {
                                         </div>
                                     </div>
                                 </motion.div>
-                            ))}
+                            )
+                        })}
+
+                        {/* Remaining notifications */}
+                        {showAllNotifications &&
+                            remainingNotifications.map((n: any, index: number) => {
+                                const IconComponent = getNotificationIcon(n.type);
+
+                                return (
+                                    <motion.div
+                                        key={n.id}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{
+                                            duration: 0.35,
+                                            delay: index * 0.06,
+                                        }}
+                                    >
+                                        <div
+                                            className={`flex hover:scale-102 items-center gap-5 rounded-2xl border p-5 shadow-sm transition-all duration-300 hover:shadow-lg ${n.is_read
+                                                ? "bg-white border-slate-200"
+                                                : "bg-blue-50 border-blue-200 border-l-4 border-l-blue-600"
+                                                }`}
+                                        >
+                                            <div className="flex md:p-4 p-2 items-center justify-center rounded-md md:rounded-xl bg-blue-100">
+                                                <IconComponent className="size-4 md:size-6 text-blue-600" />
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <p className="font-medium text-xs md:text-base text-slate-800">
+                                                    {n.message}
+                                                </p>
+
+                                                <p className="mt-2 flex gap-2 text-xs md:text-sm text-slate-500">
+                                                    <span>
+
+                                                        {format(
+                                                            new Date(n.created_at),
+                                                            "dd MMM yyyy"
+                                                        )}
+                                                    </span>
+                                                    <span>
+
+                                                        {
+                                                            format(
+                                                                new Date(n.created_at),
+                                                                "hh:mm a"
+                                                            )
+                                                        }
+                                                    </span>
+                                                </p>
+                                            </div>
+
+                                            <div className="flex items-center">
+                                                {n.is_read ? (
+                                                    <div className="flex items-center gap-2 text-green-600">
+                                                        <CheckCircle2 className="size-5 md:size-6" />
+                                                        <span className="hidden md:block text-sm font-medium">
+                                                            Read
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="cursor-pointer hover:bg-blue-600 hover:text-white"
+                                                        onClick={() =>
+                                                            handleNotification(n.id)
+                                                        }
+                                                    >
+                                                        Mark as Read
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )
+                            })}
                     </div>
                 ) : (
                     <div className="rounded-2xl border border-dashed bg-slate-50 py-12 text-center">

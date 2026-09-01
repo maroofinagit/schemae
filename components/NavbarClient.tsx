@@ -377,35 +377,35 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
                     </Link>
 
                     {/* Desktop Navigation */}
-                    {isLoggedIn ? (
+                    {pathname === "/maintenance" ? null : isLoggedIn ? (
                         <div className="hidden md:flex items-center gap-3 tracking-wide">
 
                             {isAdmin && (
                                 <Link
                                     href="/admin"
                                     className={`
-        relative
-        rounded-full
-        px-4 py-2
-        text-sm font-medium
-        transition-colors duration-200
-        ${pathname === "/admin"
+                    relative
+                    rounded-full
+                    px-4 py-2
+                    text-sm font-medium
+                    transition-colors duration-200
+                    ${pathname === "/admin"
                                             ? "text-white"
                                             : "text-white/70 hover:bg-white/6 hover:text-white"
                                         }
-    `}
+                `}
                                 >
                                     {pathname === "/admin" && (
                                         <motion.span
                                             layoutId="navbar-active"
                                             className="
-                absolute
-                inset-0
-                rounded-full
-                border
-                border-white/30
-                bg-white/20
-            "
+                            absolute
+                            inset-0
+                            rounded-full
+                            border
+                            border-white/30
+                            bg-white/20
+                        "
                                             transition={{
                                                 type: "spring",
                                                 stiffness: 420,
@@ -429,28 +429,28 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
                                         key={link.href}
                                         href={link.href}
                                         className={`
-                relative
-                rounded-full
-                px-4 py-2
-                text-sm font-medium
-                transition-colors duration-200
-                ${isActive
+                        relative
+                        rounded-full
+                        px-4 py-2
+                        text-sm font-medium
+                        transition-colors duration-200
+                        ${isActive
                                                 ? "text-white"
                                                 : "text-white/70 hover:bg-white/6 hover:text-white"
                                             }
-            `}
+                    `}
                                     >
                                         {isActive && (
                                             <motion.span
                                                 layoutId="navbar-active"
                                                 className="
-                        absolute
-                        inset-0
-                        rounded-full
-                        border
-                        border-white/30
-                        bg-white/20
-                    "
+                                absolute
+                                inset-0
+                                rounded-full
+                                border
+                                border-white/30
+                                bg-white/20
+                            "
                                                 transition={{
                                                     type: "spring",
                                                     stiffness: 420,
@@ -478,28 +478,28 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
                                         key={link.href}
                                         href={link.href}
                                         className={`
-                relative
-                rounded-full
-                px-4 py-2
-                text-sm font-medium
-                transition-colors duration-200
-                ${isActive
+                        relative
+                        rounded-full
+                        px-4 py-2
+                        text-sm font-medium
+                        transition-colors duration-200
+                        ${isActive
                                                 ? "text-white"
                                                 : "text-white/70 hover:bg-white/6 hover:text-white"
                                             }
-            `}
+                    `}
                                     >
                                         {isActive && (
                                             <motion.span
                                                 layoutId="navbar-active"
                                                 className="
-                        absolute
-                        inset-0
-                        rounded-full
-                        border
-                        border-white/30
-                        bg-white/20
-                    "
+                                absolute
+                                inset-0
+                                rounded-full
+                                border
+                                border-white/30
+                                bg-white/20
+                            "
                                                 transition={{
                                                     type: "spring",
                                                     stiffness: 420,
@@ -518,17 +518,20 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
                         </div>
                     )}
 
-                    {/* Right Side */}
-                    <div className="hidden md:flex items-center gap-2 ">
 
-                        {isLoggedIn ? (
-                            <DropdownMenu
-                                open={menuOpen}
-                                onOpenChange={setMenuOpen}
-                            >
-                                <DropdownMenuTrigger asChild>
-                                    <button
-                                        className="
+                    {/* Right Side */}
+
+                    {pathname !== "/maintenance" && (
+                        <div className="hidden md:flex items-center gap-2 ">
+
+                            {isLoggedIn ? (
+                                <DropdownMenu
+                                    open={menuOpen}
+                                    onOpenChange={setMenuOpen}
+                                >
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            className="
                                     flex items-center gap-2.5
                                     rounded-full
                                     px-4
@@ -536,71 +539,71 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
                                     cursor-pointer
                                     outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0
                                 "
-                                    >
+                                        >
 
-                                        <span className="text-sm font-medium tracking-wide text-white mr-4">
-                                            {user?.name?.split(' ')[0] || "My Account"}
-                                        </span>
+                                            <span className="text-sm font-medium tracking-wide text-white mr-4">
+                                                {user?.name?.split(' ')[0] || "My Account"}
+                                            </span>
+                                            <motion.div
+                                                animate={{
+                                                    scale: menuOpen ? 1.06 : 1,
+                                                    rotate: menuOpen ? 2 : 0,
+                                                }}
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 500,
+                                                    damping: 30,
+                                                }}
+                                                className="relative h-9 w-9 shrink-0"
+                                            >
+                                                <Avatar className="h-9 w-9 border border-white/10">
+                                                    <AvatarImage
+                                                        className="object-cover object-center"
+                                                        src={user?.image || "/avatar.png"}
+                                                        alt="@user"
+                                                    />
+
+                                                    <AvatarFallback className="bg-white/10 text-white">
+                                                        {user?.name
+                                                            ? user.name.charAt(0).toUpperCase()
+                                                            : "U"}
+                                                    </AvatarFallback>
+
+
+                                                </Avatar>
+
+                                                {(user?.notifications ?? 0) > 0 && (
+                                                    <span className="absolute -top-1 -right-1 h-3 aspect-square rounded-full bg-red-500 border-2 border-white" />
+                                                )}
+
+                                            </motion.div>
+                                        </button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent
+                                        forceMount
+                                        asChild
+                                        align="end"
+                                    >
                                         <motion.div
+                                            initial={{
+                                                opacity: 0,
+                                                scale: 0.94,
+                                                y: -6,
+                                                transformOrigin: "top right",
+                                            }}
                                             animate={{
-                                                scale: menuOpen ? 1.06 : 1,
-                                                rotate: menuOpen ? 2 : 0,
+                                                opacity: menuOpen ? 1 : 0,
+                                                scale: menuOpen ? 1 : 0.94,
+                                                y: menuOpen ? 0 : -6,
                                             }}
                                             transition={{
                                                 type: "spring",
-                                                stiffness: 500,
-                                                damping: 30,
+                                                stiffness: 450,
+                                                damping: 32,
+                                                mass: 0.7,
                                             }}
-                                            className="relative h-9 w-9 shrink-0"
-                                        >
-                                            <Avatar className="h-9 w-9 border border-white/10">
-                                                <AvatarImage
-                                                    className="object-cover object-center"
-                                                    src={user?.image || "/avatar.png"}
-                                                    alt="@user"
-                                                />
-
-                                                <AvatarFallback className="bg-white/10 text-white">
-                                                    {user?.name
-                                                        ? user.name.charAt(0).toUpperCase()
-                                                        : "U"}
-                                                </AvatarFallback>
-
-
-                                            </Avatar>
-
-                                            {(user?.notifications ?? 0) > 0 && (
-                                                <span className="absolute -top-1 -right-1 h-3 aspect-square rounded-full bg-red-500 border-2 border-white" />
-                                            )}
-
-                                        </motion.div>
-                                    </button>
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent
-                                    forceMount
-                                    asChild
-                                    align="end"
-                                >
-                                    <motion.div
-                                        initial={{
-                                            opacity: 0,
-                                            scale: 0.94,
-                                            y: -6,
-                                            transformOrigin: "top right",
-                                        }}
-                                        animate={{
-                                            opacity: menuOpen ? 1 : 0,
-                                            scale: menuOpen ? 1 : 0.94,
-                                            y: menuOpen ? 0 : -6,
-                                        }}
-                                        transition={{
-                                            type: "spring",
-                                            stiffness: 450,
-                                            damping: 32,
-                                            mass: 0.7,
-                                        }}
-                                        className="
+                                            className="
             w-52
             rounded-xl
             border
@@ -610,123 +613,123 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
             tracking-wide
             text-gray-800
         "
-                                    >
-                                        <DropdownMenuLabel className="flex items-center ">
-                                            <Avatar className="h-7 w-7 mr-4 border border-black/40">
-                                                <AvatarImage
-                                                    src={user?.image || "/avatars/user.png"}
-                                                    className="object-cover object-center"
-                                                    alt="@user"
-                                                />
-
-                                                <AvatarFallback className="bg-white/10 text-white">
-                                                    {user?.name
-                                                        ? user.name.charAt(0).toUpperCase()
-                                                        : "U"}
-                                                </AvatarFallback>
-                                            </Avatar>
-
-
-                                            <span className="font-medium flex gap-0 flex-col">
-                                                <span className="text-xs text-gray-500">
-                                                    Welcome,
-                                                </span>
-                                                {user?.name || "My Account"}
-                                            </span>
-                                        </DropdownMenuLabel>
-
-                                        <DropdownMenuSeparator className="border border-gray-200" />
-
-                                        <motion.div
-                                            variants={dropdownContainer}
-                                            initial="hidden"
-                                            animate={menuOpen ? "visible" : "hidden"}
                                         >
-                                            <DropdownMenuGroup>
-                                                <DropdownMenuItem
-                                                    asChild
-                                                    onClick={() => setMenuOpen(false)}
-                                                >
-                                                    <motion.div
-                                                        variants={dropdownItem}
-                                                        className="
+                                            <DropdownMenuLabel className="flex items-center ">
+                                                <Avatar className="h-7 w-7 mr-4 border border-black/40">
+                                                    <AvatarImage
+                                                        src={user?.image || "/avatars/user.png"}
+                                                        className="object-cover object-center"
+                                                        alt="@user"
+                                                    />
+
+                                                    <AvatarFallback className="bg-white/10 text-white">
+                                                        {user?.name
+                                                            ? user.name.charAt(0).toUpperCase()
+                                                            : "U"}
+                                                    </AvatarFallback>
+                                                </Avatar>
+
+
+                                                <span className="font-medium flex gap-0 flex-col">
+                                                    <span className="text-xs text-gray-500">
+                                                        Welcome,
+                                                    </span>
+                                                    {user?.name || "My Account"}
+                                                </span>
+                                            </DropdownMenuLabel>
+
+                                            <DropdownMenuSeparator className="border border-gray-200" />
+
+                                            <motion.div
+                                                variants={dropdownContainer}
+                                                initial="hidden"
+                                                animate={menuOpen ? "visible" : "hidden"}
+                                            >
+                                                <DropdownMenuGroup>
+                                                    <DropdownMenuItem
+                                                        asChild
+                                                        onClick={() => setMenuOpen(false)}
+                                                    >
+                                                        <motion.div
+                                                            variants={dropdownItem}
+                                                            className="
             cursor-pointer
             rounded-lg
             focus:bg-gray-200
             focus:text-black
         "
-                                                    >
-                                                        <Link
-                                                            href="/dashboard"
-                                                            className="flex w-full items-center gap-4"
                                                         >
-                                                            <LayoutDashboard className="h-4 w-4" />
-                                                            Dashboard
-                                                        </Link>
-                                                    </motion.div>
-                                                </DropdownMenuItem>
+                                                            <Link
+                                                                href="/dashboard"
+                                                                className="flex w-full items-center gap-4"
+                                                            >
+                                                                <LayoutDashboard className="h-4 w-4" />
+                                                                Dashboard
+                                                            </Link>
+                                                        </motion.div>
+                                                    </DropdownMenuItem>
 
-                                                <DropdownMenuItem
-                                                    asChild
-                                                    onClick={() => setMenuOpen(false)}
-                                                >
-                                                    <motion.div
-                                                        variants={dropdownItem}
-                                                        className="
+                                                    <DropdownMenuItem
+                                                        asChild
+                                                        onClick={() => setMenuOpen(false)}
+                                                    >
+                                                        <motion.div
+                                                            variants={dropdownItem}
+                                                            className="
             cursor-pointer
             rounded-lg
             focus:bg-gray-200
             focus:text-black
             relative
         "
-                                                    >
-                                                        <Link
-                                                            href="/profile"
-                                                            className="flex w-full items-center gap-4"
                                                         >
-                                                            <User className="h-4 w-4" />
-                                                            Profile
-                                                        </Link>
-                                                        {(user?.notifications ?? 0) > 0 && (
-                                                            <span className="absolute right-1 h-5 w-5 flex items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white border-2">
-                                                                {user?.notifications}
-                                                            </span>
-                                                        )}
-                                                    </motion.div>
-                                                </DropdownMenuItem>
+                                                            <Link
+                                                                href="/profile"
+                                                                className="flex w-full items-center gap-4"
+                                                            >
+                                                                <User className="h-4 w-4" />
+                                                                Profile
+                                                            </Link>
+                                                            {(user?.notifications ?? 0) > 0 && (
+                                                                <span className="absolute right-1 h-5 w-5 flex items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white border-2">
+                                                                    {user?.notifications}
+                                                                </span>
+                                                            )}
+                                                        </motion.div>
+                                                    </DropdownMenuItem>
 
-                                            </DropdownMenuGroup>
-                                        </motion.div>
+                                                </DropdownMenuGroup>
+                                            </motion.div>
 
-                                        <DropdownMenuSeparator className="border border-gray-200" />
+                                            <DropdownMenuSeparator className="border border-gray-200" />
 
-                                        <DropdownMenuItem
-                                            onClick={() => {
-                                                handleLogout();
-                                                setMenuOpen(false);
-                                            }}
-                                            className="
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    handleLogout();
+                                                    setMenuOpen(false);
+                                                }}
+                                                className="
                                     cursor-pointer
                                     font-medium
                                     text-red-500
                                     focus:bg-red-500/10
                                     focus:text-red-400
                                 "
-                                        >
-                                            <LogOut className="mr-2 h-4 w-4 text-red-500/60" />
-                                            Logout
-                                        </DropdownMenuItem>
-                                    </motion.div>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <>
-                                <div className="relative flex items-center gap-2 rounded-full">
-                                    {/* Active background */}
-                                    {(pathname === "/signin" || pathname === "/signup") && (
-                                        <motion.div
-                                            layoutId="auth-active"
-                                            className="
+                                            >
+                                                <LogOut className="mr-2 h-4 w-4 text-red-500/60" />
+                                                Logout
+                                            </DropdownMenuItem>
+                                        </motion.div>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <>
+                                    <div className="relative flex items-center gap-2 rounded-full">
+                                        {/* Active background */}
+                                        {(pathname === "/signin" || pathname === "/signup") && (
+                                            <motion.div
+                                                layoutId="auth-active"
+                                                className="
                 pointer-events-none
                 absolute
                 inset-y-0
@@ -736,22 +739,22 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
                 border border-white/30
                 bg-white/20
             "
-                                            animate={{
-                                                x: pathname === "/signin" ? 0 : 90,
-                                            }}
-                                            transition={{
-                                                type: "spring",
-                                                stiffness: 500,
-                                                damping: 38,
-                                                mass: 0.7,
-                                            }}
-                                        />
-                                    )}
+                                                animate={{
+                                                    x: pathname === "/signin" ? 0 : 90,
+                                                }}
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 500,
+                                                    damping: 38,
+                                                    mass: 0.7,
+                                                }}
+                                            />
+                                        )}
 
-                                    <Button
-                                        asChild
-                                        variant="ghost"
-                                        className="
+                                        <Button
+                                            asChild
+                                            variant="ghost"
+                                            className="
             relative z-10
             w-20.5
             rounded-full
@@ -760,16 +763,16 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
             hover:bg-white/20
             hover:text-white
         "
-                                    >
-                                        <Link href="/signin">
-                                            Sign In
-                                        </Link>
-                                    </Button>
+                                        >
+                                            <Link href="/signin">
+                                                Sign In
+                                            </Link>
+                                        </Button>
 
-                                    <Button
-                                        asChild
-                                        variant="ghost"
-                                        className="
+                                        <Button
+                                            asChild
+                                            variant="ghost"
+                                            className="
             relative z-10
             w-20.5
             rounded-full
@@ -778,15 +781,17 @@ export default function NavbarClient({ isAdmin, notifications }: NavbarClientPro
             hover:bg-white/20
             hover:text-white
         "
-                                    >
-                                        <Link href="/signup">
-                                            Sign Up
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </div>
+                                        >
+                                            <Link href="/signup">
+                                                Sign Up
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+
                 </div>
             </div>
         </nav>

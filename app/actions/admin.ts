@@ -6,6 +6,7 @@ import { auth } from "../lib/auth";
 import { headers } from "next/headers";
 import { getEmailTemplate } from "@/app/lib/emailTempelete";
 import nodemailer from "nodemailer";
+import { updateTag } from "next/cache";
 
 const mailTransporter = nodemailer.createTransport({
     service: "gmail",
@@ -108,56 +109,6 @@ export async function sendSignUpAdminNot(to: string, name: string) {
     }
 }
 
-
-export async function deleteAccount() {
-    try {
-
-        const session = await auth.api.getSession({
-            headers: await headers(),
-        });
-
-        console.log("Session data:", session);
-
-        if (!session?.session) {
-            return {
-                success: false,
-                message: "Unauthorized",
-            };
-        }
-
-        const userId = session.session.userId;
-
-        // delete user
-        await db.user.delete({
-            where: {
-                id: userId,
-            },
-        });
-
-        // sign out
-        await auth.api.signOut({
-            headers: await headers(),
-        });
-
-        return {
-            success: true,
-            message: "Account deleted successfully",
-        };
-
-    } catch (error) {
-
-        console.error(
-            "Delete account error:",
-            error
-        );
-
-        return {
-            success: false,
-            message: "Something went wrong",
-        };
-    }
-}
-
 interface SendEmailProps {
     to: string;
     name: string;
@@ -247,4 +198,87 @@ export async function getUserData(userId: string) {
         console.error("Error fetching user data:", error);
         return { success: false, message: "Failed to fetch user data" };
     }
-}   
+}
+
+export async function sendAdminNotification(message: string) {
+    if (!message.trim()) {
+        return {
+            success: false,
+            error: "Notification message cannot be empty.",
+        };
+    }
+
+    try {
+        const users = await db.user.findMany({
+            select: {
+                id: true,
+            },
+        });
+
+        if (users.length === 0) {
+            return {
+                success: false,
+                error: "No users found.",
+            };
+        }
+
+        await db.notification.createMany({
+            data: users.map((user) => ({
+                user_id: user.id,
+                message: message.trim(),
+                type: "ADMIN",
+            })),
+        });
+
+        users.forEach(async (user) => {
+            updateTag(`notifications-${user.id}`);
+        });
+
+        return {
+            success: true,
+            message: `Notification sent to ${users.length} users.`,
+        };
+    } catch (error) {
+        console.error("Failed to send admin notification:", error);
+
+        return {
+            success: false,
+            error: "Failed to send notification.",
+        };
+    }
+}
+
+export async function sendNotificationToUser(
+    userId: string,
+    message: string
+) {
+    if (!message.trim()) {
+        return {
+            success: false,
+            error: "Notification message cannot be empty.",
+        };
+    }
+
+    try {
+        await db.notification.create({
+            data: {
+                user_id: userId,
+                message: message.trim(),
+                type: "ADMIN",
+            },
+        });
+
+        updateTag(`notifications-${userId}`);
+
+        return {
+            success: true,
+        };
+    } catch (error) {
+        console.error("Failed to send notification:", error);
+
+        return {
+            success: false,
+            error: "Failed to send notification.",
+        };
+    }
+}

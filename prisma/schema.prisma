@@ -126,7 +126,7 @@ model UserExam {
   exam             Exam           @relation(fields: [exam_id], references: [id], onDelete: Cascade)
   user             User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
   tests            Test[]
-  roadmapJson       Json?     
+  roadmapJson      Json?
   notifications    Notification[]
 }
 
@@ -280,12 +280,13 @@ model TestAttempt {
 
 model Notification {
   id           Int       @id @default(autoincrement())
-  roadmap_id   Int
+  roadmap_id   Int?
   user_id      String
-  user_exam_id Int
+  user_exam_id Int?
   message      String
   is_read      Boolean   @default(false)
   created_at   DateTime  @default(now())
+  type         NotificationType? 
   user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   roadmap      Roadmap?  @relation(fields: [roadmap_id], references: [id], onDelete: Cascade)
   userExam     UserExam? @relation(fields: [user_exam_id], references: [id], onDelete: Cascade)
@@ -342,4 +343,13 @@ enum RoadmapStatus {
   in_progress
   completed
   failed
+}
+
+enum NotificationType {
+  ROADMAP
+  TEST
+  EXAM
+  ACHIEVEMENT
+  SYSTEM
+  ADMIN
 }
