@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { deleteUserAdmin, sendNotificationToUser } from "@/app/actions/admin";
+import { deleteUserAdmin, deleteUserExamAdmin, sendNotificationToUser } from "@/app/actions/admin";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 export default function UserDetailClient({ user }: any) {
@@ -24,9 +24,11 @@ export default function UserDetailClient({ user }: any) {
 
     const [message, setMessage] = useState("");
     const [isPending, setIsPending] = useState(false);
-    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [confirmDelUserDialogOpen, setConfirmDelUserDialogOpen] = useState(false);
+    const [confirmDelUserExamDialogOpen, setConfirmDelUserExamDialogOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [dialogData, setDialogData] = useState({ title: "", description: "", type: "default" as "update" | "delete" | "default", onConfirm: () => { } });
+    const [delUserDialogData, setDelUserDialogData] = useState({ title: "", description: "", type: "default" as "update" | "delete" | "default", onConfirm: () => { } });
+    const [delExamDialogData, setDelExamDialogData] = useState({ title: "", description: "", type: "default" as "update" | "delete" | "default", onConfirm: () => { } });
 
     const handleSendNotification = async () => {
         setIsPending(true);
@@ -66,23 +68,43 @@ export default function UserDetailClient({ user }: any) {
     );
 
     const handleDeleteUser = async () => {
-    
-
         try {
 
             setIsDeleting(true);
 
             const response = await deleteUserAdmin(user.id);
-            
-            if (response.success) {
+
+            if (1) {
                 toast.success("User deleted successfully!");
                 router.push("/admin");
             } else {
                 throw new Error(response.message || "Failed to delete user.");
             }
-        } catch (error : Error | any) {
+        } catch (error: Error | any) {
             console.error("Error deleting user:", error.message);
             toast.error("An unexpected error occurred while deleting the user.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleDeleteUserExam = async (examId: number) => {
+        try {
+
+            setIsDeleting(true);
+
+            const response = await deleteUserExamAdmin(examId, user.id);
+
+            if (1) {
+                toast.success("User exam deleted successfully!");
+                router.push("/admin");
+            } else {
+                console.error(response.message || "Failed to delete user exam.");
+                throw new Error(response.message || "Failed to delete user exam.");
+            }
+        } catch (error: Error | any) {
+            console.error("Error deleting user exam:", error.message);
+            toast.error("An unexpected error occurred while deleting the user exam.");
         } finally {
             setIsDeleting(false);
         }
@@ -92,12 +114,21 @@ export default function UserDetailClient({ user }: any) {
         <div className="p-6 bg-gray-50 min-h-screen pt-32 md:px-12 px-6">
 
             <ConfirmDialog
-                open={confirmDialogOpen}
-                onOpenChange={setConfirmDialogOpen}
-                title="Delete User"
-                description={`Are you sure you want to delete ${user.name || "this user"}? This action cannot be undone.`}
-                type="delete"
-                onConfirm={handleDeleteUser}
+                open={confirmDelUserDialogOpen}
+                onOpenChange={setConfirmDelUserDialogOpen}
+                title={delUserDialogData.title}
+                description={delUserDialogData.description}
+                type={delUserDialogData.type}
+                onConfirm={delUserDialogData.onConfirm}
+            />
+
+            <ConfirmDialog
+                open={confirmDelUserExamDialogOpen}
+                onOpenChange={setConfirmDelUserExamDialogOpen}
+                title={delExamDialogData.title}
+                description={delExamDialogData.description}
+                type={delExamDialogData.type}
+                onConfirm={delExamDialogData.onConfirm}
             />
 
             {/* 👤 PROFILE HEADER */}
@@ -280,20 +311,40 @@ export default function UserDetailClient({ user }: any) {
                                     {exam.exam.name}
                                 </h3>
 
-                                <span
-                                    className={`px-2 py-1 text-xs rounded-full ${!exam.roadmap
-                                        ? "bg-gray-100 text-gray-600"
-                                        : exam.roadmap_status === "completed"
-                                            ? "bg-green-100 text-green-700"
-                                            : "bg-yellow-100 text-yellow-700"
-                                        }`}
-                                >
-                                    {!exam.roadmap
-                                        ? "No Roadmap"
-                                        : exam.roadmap_status === "completed"
-                                            ? "Completed"
-                                            : "In Progress"}
-                                </span>
+                                <div className="flex items-center gap-3">
+
+                                    <span
+                                        className={`px-2 py-1 text-xs rounded-full ${!exam.roadmap
+                                            ? "bg-gray-100 text-gray-600"
+                                            : exam.roadmap_status === "completed"
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-yellow-100 text-yellow-700"
+                                            }`}
+                                    >
+                                        {!exam.roadmap
+                                            ? "No Roadmap"
+                                            : exam.roadmap_status === "completed"
+                                                ? "Completed"
+                                                : "In Progress"}
+                                    </span>
+
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => {
+                                            setDelExamDialogData({
+                                                title: "Delete Exam",
+                                                description: `Are you sure you want to delete the exam "${exam.exam.name}"?`,
+                                                type: "delete",
+                                                onConfirm: () => handleDeleteUserExam(exam.id), // Pass the exam ID to the delete handler
+                                            });
+                                            setConfirmDelUserExamDialogOpen(true);
+                                        }}
+                                    >
+                                        Delete
+                                    </Button>
+
+                                </div>
                             </div>
 
                             {/* 📅 DATES */}
@@ -344,15 +395,15 @@ export default function UserDetailClient({ user }: any) {
                     Back to Dashboard
                 </Button>
                 <Button variant="destructive" className="hover:bg-red-700 hover:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => {
-                    setDialogData({
+                    setDelUserDialogData({
                         title: "Delete User",
                         description: `Are you sure you want to delete ${user.name || "this user"} account? This action cannot be undone.`,
                         type: "delete",
-                        onConfirm: handleDeleteUser
+                        onConfirm: handleDeleteUser, 
                     });
-                    setConfirmDialogOpen(true);
+                    setConfirmDelUserDialogOpen(true);
                 }}
-                disabled={isDeleting}
+                    disabled={isDeleting}
                 >
                     Delete {user.name?.split(" ")[0] || "User"} Account
                 </Button>

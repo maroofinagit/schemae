@@ -320,3 +320,41 @@ export async function deleteUserAdmin(userId: string) {
         return { success: false, message: "Failed to delete user" };
     }
 }
+
+export async function deleteUserExamAdmin(examId: number, userId: string) {
+    try {
+
+        const session = await auth.api.getSession({
+            headers: await headers(),
+        });
+
+        if (!session || session.session === null){
+            return { success: false, message: "Unauthorized" };
+        }
+
+        const adminUser = await db.user.findUnique({
+            where: { id: session.session.userId },
+        });
+
+        if (!adminUser || adminUser.role !== "admin") {
+            return { success: false, message: "Unauthorized" };
+        }
+
+        const userExam = await db.userExam.findUnique({
+            where: { id: examId },
+        });
+
+        if (!userExam) {
+            return { success: false, message: "User exam not found" };
+        }
+
+        await db.userExam.delete({
+            where: { id: examId },
+        });
+
+        return { success: true, message: "User exam deleted successfully" };
+    } catch (error) {
+        console.error("Error deleting user exam:", error);
+        return { success: false, message: "Failed to delete user exam" };
+    }
+}
