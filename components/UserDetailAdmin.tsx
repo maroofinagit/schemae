@@ -14,7 +14,8 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { sendNotificationToUser } from "@/app/actions/admin";
+import { deleteUserAdmin, sendNotificationToUser } from "@/app/actions/admin";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export default function UserDetailClient({ user }: any) {
 
@@ -23,6 +24,9 @@ export default function UserDetailClient({ user }: any) {
 
     const [message, setMessage] = useState("");
     const [isPending, setIsPending] = useState(false);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [dialogData, setDialogData] = useState({ title: "", description: "", type: "default" as "update" | "delete" | "default", onConfirm: () => { } });
 
     const handleSendNotification = async () => {
         setIsPending(true);
@@ -61,9 +65,40 @@ export default function UserDetailClient({ user }: any) {
         ) / (totalExams || 1)
     );
 
+    const handleDeleteUser = async () => {
+    
+
+        try {
+
+            setIsDeleting(true);
+
+            const response = await deleteUserAdmin(user.id);
+            
+            if (response.success) {
+                toast.success("User deleted successfully!");
+                router.push("/admin");
+            } else {
+                throw new Error(response.message || "Failed to delete user.");
+            }
+        } catch (error : Error | any) {
+            console.error("Error deleting user:", error.message);
+            toast.error("An unexpected error occurred while deleting the user.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen pt-32 md:px-12 px-6">
+
+            <ConfirmDialog
+                open={confirmDialogOpen}
+                onOpenChange={setConfirmDialogOpen}
+                title="Delete User"
+                description={`Are you sure you want to delete ${user.name || "this user"}? This action cannot be undone.`}
+                type="delete"
+                onConfirm={handleDeleteUser}
+            />
 
             {/* 👤 PROFILE HEADER */}
             <div className="bg-white rounded-xl shadow-sm border p-6 mb-6 flex items-center gap-6">
@@ -303,10 +338,23 @@ export default function UserDetailClient({ user }: any) {
                 </div>
             </div>
 
-            {/* 🔙 BACK BUTTON */}
-            <div className="mt-6">
+
+            <div className="mt-6 flex justify-between items-center gap-4 flex-wrap">
                 <Button variant="outline" className="hover:bg-black hover:text-white cursor-pointer" onClick={() => router.push("/admin")}>
                     Back to Dashboard
+                </Button>
+                <Button variant="destructive" className="hover:bg-red-700 hover:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => {
+                    setDialogData({
+                        title: "Delete User",
+                        description: `Are you sure you want to delete ${user.name || "this user"} account? This action cannot be undone.`,
+                        type: "delete",
+                        onConfirm: handleDeleteUser
+                    });
+                    setConfirmDialogOpen(true);
+                }}
+                disabled={isDeleting}
+                >
+                    Delete {user.name?.split(" ")[0] || "User"} Account
                 </Button>
             </div>
 

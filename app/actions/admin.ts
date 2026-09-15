@@ -282,3 +282,41 @@ export async function sendNotificationToUser(
         };
     }
 }
+
+export async function deleteUserAdmin(userId: string) {
+    try {
+
+        const session = await auth.api.getSession({
+            headers: await headers(),
+        });
+
+        if (!session || session.session === null){
+            return { success: false, message: "Unauthorized" };
+        }
+
+        const adminUser = await db.user.findUnique({
+            where: { id: session.session.userId },
+        });
+
+        if (!adminUser || adminUser.role !== "admin") {
+            return { success: false, message: "Unauthorized" };
+        }
+
+        const user = await db.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!user) {
+            return { success: false, message: "User not found" };
+        }
+
+        await db.user.delete({
+            where: { id: userId },
+        });
+
+        return { success: true, message: "User deleted successfully" };
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        return { success: false, message: "Failed to delete user" };
+    }
+}
