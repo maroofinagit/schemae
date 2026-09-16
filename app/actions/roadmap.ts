@@ -4,9 +4,7 @@ import { db } from "@/app/lib/db";
 import { GoogleGenAI } from "@google/genai";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { RoadmapSchema } from "@/app/lib/zodSchema";
-import { i } from "framer-motion/client";
 import { Prisma } from "@/generated/prisma/client";
-import { error } from "next/dist/build/output/log";
 import { NotificationType } from "@/generated/prisma/enums";
 
 const ai = new GoogleGenAI({});
@@ -70,7 +68,7 @@ export async function generateWithFallback(prompt: string, onProgress: (event: P
                     message: `Generating roadmap with ${model} (Attempt ${attempt}/2)...`,
                     progress: attemptProgress,
                 });
-
+                
                 const response =
                     await ai.models.generateContent({
                         model,

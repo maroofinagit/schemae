@@ -156,7 +156,7 @@ export default function ClientExamStart({ exam }: { exam: any }) {
                     }
 
                     toast.success(
-                        "🎉 Roadmap generated successfully!"
+                        "Roadmap generated successfully!"
                     );
 
                     setLoadingMessage(
