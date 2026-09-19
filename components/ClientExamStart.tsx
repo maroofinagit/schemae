@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { addYears, format, addMonths, subYears } from 'date-fns';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ export default function ClientExamStart({ exam }: { exam: any }) {
 
     const { soundEnabled } = useUser();
     const [loading, setLoading] = useState(false);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [loadingMessage, setLoadingMessage] = useState('');
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState('');
@@ -112,7 +113,7 @@ export default function ClientExamStart({ exam }: { exam: any }) {
                     setProgress(data.progress);
 
                     // AI generation starts
-                    if (data.step === "ai_generation" || data.step==="loading_existing") {
+                    if (data.step === "ai_generation" || data.step === "loading_existing") {
 
                         if (!messageLoopRef.current) {
                             const aiMessages = [
@@ -162,7 +163,7 @@ export default function ClientExamStart({ exam }: { exam: any }) {
                     setLoadingMessage(
                         "🎯 Roadmap ready! Redirecting to your dashboard..."
                     );
-                    
+
                     setTimeout(() => {
                         router.replace(
                             `/dashboard/roadmap/${user_exam_id}`
@@ -257,6 +258,27 @@ export default function ClientExamStart({ exam }: { exam: any }) {
         }
     }
 
+    useEffect(() => {
+        if (!loading) {
+            setElapsedSeconds(0);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setElapsedSeconds((prev) => prev + 1);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [loading]);
+
+    const formatTime = (seconds: number) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+
+        return `${minutes}:${remainingSeconds
+            .toString()
+            .padStart(2, "0")}`;
+    };
 
     const { name } = useUser();
 
@@ -279,6 +301,17 @@ export default function ClientExamStart({ exam }: { exam: any }) {
                             <div className="flex justify-center">
                                 <div className="h-10 aspect-square rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
                             </div>
+
+                            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                                <span>⏱️</span>
+                                <span>
+                                    Time taking:{" "}
+                                    <span className="font-semibold text-gray-700">
+                                        {formatTime(elapsedSeconds) + " >"}
+                                    </span>
+                                </span>
+                            </div>
+
 
                             <div className="space-y-2">
                                 <h2 className="text-2xl font-semibold text-gray-800">

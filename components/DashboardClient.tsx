@@ -101,11 +101,34 @@ export default function DashboardAnalytics({
         newExams.length ? newExams[0] : null,
     );
     const [regenerating, setRegenerating] = useState(false);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [loadingMessage, setLoadingMessage] = useState("");
     const [progress, setProgress] = useState(0);
     const [deleting, setDeleting] = useState(false);
     const [dltDialogOpen, setDltDialogOpen] = useState(false);
     const messageLoopRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (!regenerating) {
+            setElapsedSeconds(0);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setElapsedSeconds((prev) => prev + 1);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [regenerating]);
+
+    const formatTime = (seconds: number) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+
+        return `${minutes}:${remainingSeconds
+            .toString()
+            .padStart(2, "0")}`;
+    };
 
     useEffect(() => {
         setNewExams(dashboardUser?.exams ?? []);
@@ -685,6 +708,17 @@ export default function DashboardAnalytics({
                         <div className="flex justify-center">
                             <div className="h-10 aspect-square rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
                         </div>
+
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                            <span>⏱️</span>
+                            <span>
+                                Time taking:{" "}
+                                <span className="font-semibold text-gray-700">
+                                    {formatTime(elapsedSeconds) + " >"}
+                                </span>
+                            </span>
+                        </div>
+
 
                         <div className="space-y-2">
                             <h2 className="text-2xl font-semibold text-gray-800">
