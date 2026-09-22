@@ -4,10 +4,9 @@ import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
 import { cn } from "@/app/lib/utils";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { generateTestAttempt } from "@/app/actions/test";
 import { motion } from "framer-motion";
 import { useUser } from "@/app/context/userContext";
 import { playError, playNotification } from "@/app/lib/sound";
@@ -32,12 +31,41 @@ interface TestsClientProps {
 
 export default function TestsClient({ data, baseId }: TestsClientProps) {
 
-    const [generatingTestId, setGeneratingTestId] = useState<number | null>(null);
+    const [selectedTest, setSelectedTest] = useState<Test | null>({
+        testId: 0,
+        title: "Test 1",
+        description: "Sample test description",
+        status: 'LOCKED',
+        createdAt: new Date(),
+    });
     const [newData, setNewData] = useState(data);
     const [progress, setProgress] = useState<number>(0);
     const messageLoopRef = useRef<NodeJS.Timeout | null>(null);
     const [loadingMessage, setLoadingMessage] = useState<string>("");
+    const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
     const { name } = useUser();
+
+    useEffect(() => {
+        if (!selectedTest) {
+            setElapsedSeconds(0);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setElapsedSeconds((prev) => prev + 1);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [selectedTest]);
+
+    const formatTime = (seconds: number) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+
+        return `${minutes}:${remainingSeconds
+            .toString()
+            .padStart(2, "0")}`;
+    };
 
 
     const markTestAsGive = (testId: number) => {
@@ -73,16 +101,25 @@ export default function TestsClient({ data, baseId }: TestsClientProps) {
 
     return (
         <>
-            {generatingTestId !== null && (
+            {selectedTest !== null && (
                 <div className="fixed h-screen inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-6 cursor-not-allowed">
                     <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border text-center space-y-5">
 
                         <div className="text-sm text-justify tracking-tight text-gray-500 flex flex-col gap-y-2">
                             <span>
-                                Hey {name?.split(" ")[0] || "there"} ! Your test is being carefully built and may take around <span className="font-bold whitespace-nowrap">4-5</span> minutes as its a big responsible task. The app may seem hanged but it's not, don’t worry it’s still working in the background.
+                                Hey {name?.split(" ")[0] || "there"} ! Your{" "}
+                                <span className="font-semibold text-gray-700">
+                                    {selectedTest?.title || "test"}
+                                </span>{" "}
+                                is being carefully built and may take around{" "}
+                                <span className="font-bold whitespace-nowrap">4-5</span>{" "}
+                                minutes as it's a big responsible task. The app may seem hanged but it's not,
+                                don’t worry it’s still working in the background.
                             </span>
+
                             <span>
-                                ☕️ Brew yourself a coffee, scroll for a while and let us handle the planning. We’ll let you know with a notification sound as soon as your test is ready.
+                                ☕️ Brew yourself a coffee, scroll for a while and let us handle the planning.
+                                We’ll let you know with a notification sound as soon as your test is ready.
                             </span>
                         </div>
 
@@ -90,9 +127,19 @@ export default function TestsClient({ data, baseId }: TestsClientProps) {
                             <div className="h-10 aspect-square rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
                         </div>
 
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                            <span>⏱️</span>
+                            <span>
+                                Time taking:{" "}
+                                <span className="font-semibold text-gray-700">
+                                    {formatTime(elapsedSeconds) + " >"}
+                                </span>
+                            </span>
+                        </div>
+
                         <div className="space-y-2">
                             <h2 className="text-2xl font-semibold text-gray-800">
-                                Generating Your Test for {newData.examName}...
+                                Generating {selectedTest?.title || "test"} for {newData.examName || "the exam"}...
                             </h2>
 
                             <p className="text-sm leading-relaxed text-gray-500">
@@ -103,6 +150,7 @@ export default function TestsClient({ data, baseId }: TestsClientProps) {
                         <div className="pt-3 space-y-2">
                             <div className="flex items-center justify-between text-xs text-gray-500">
                                 <span>Progress</span>
+
                                 <span className="font-semibold text-blue-600">
                                     {progress}%
                                 </span>
@@ -123,6 +171,7 @@ export default function TestsClient({ data, baseId }: TestsClientProps) {
                                 Please do not refresh or close this page.
                             </p>
                         </div>
+
                     </div>
                 </div>
             )}
@@ -142,9 +191,9 @@ export default function TestsClient({ data, baseId }: TestsClientProps) {
                     Click on <span className="font-bold text-blue-600">"GIVE"</span> to attempt a test or <span className="font-bold text-green-600">"GENERATE"</span> to create a new one.<br />
                     Test which are locked will require you to complete certain tasks or previous tests first.
                 </p>
-                <TestSection title="Weekly Tests" tests={newData.weekly} baseId={baseId} generatingTestId={generatingTestId} setGeneratingTestId={setGeneratingTestId} markTestAsGive={markTestAsGive} setProgress={setProgress} messageLoopRef={messageLoopRef} loadingMessage={loadingMessage} setLoadingMessage={setLoadingMessage} />
-                <TestSection title="Phase Tests" tests={newData.phase} baseId={baseId} generatingTestId={generatingTestId} setGeneratingTestId={setGeneratingTestId} markTestAsGive={markTestAsGive} setProgress={setProgress} messageLoopRef={messageLoopRef} loadingMessage={loadingMessage} setLoadingMessage={setLoadingMessage} />
-                <TestSection title="Final Tests" tests={newData.final} baseId={baseId} generatingTestId={generatingTestId} setGeneratingTestId={setGeneratingTestId} markTestAsGive={markTestAsGive} setProgress={setProgress} messageLoopRef={messageLoopRef} loadingMessage={loadingMessage} setLoadingMessage={setLoadingMessage} />
+                <TestSection title="Weekly Tests" tests={newData.weekly} baseId={baseId} selectedTest={selectedTest} setSelectedTest={setSelectedTest} markTestAsGive={markTestAsGive} setProgress={setProgress} messageLoopRef={messageLoopRef} loadingMessage={loadingMessage} setLoadingMessage={setLoadingMessage} />
+                <TestSection title="Phase Tests" tests={newData.phase} baseId={baseId} selectedTest={selectedTest} setSelectedTest={setSelectedTest} markTestAsGive={markTestAsGive} setProgress={setProgress} messageLoopRef={messageLoopRef} loadingMessage={loadingMessage} setLoadingMessage={setLoadingMessage} />
+                <TestSection title="Final Tests" tests={newData.final} baseId={baseId} selectedTest={selectedTest} setSelectedTest={setSelectedTest} markTestAsGive={markTestAsGive} setProgress={setProgress} messageLoopRef={messageLoopRef} loadingMessage={loadingMessage} setLoadingMessage={setLoadingMessage} />
             </div>
         </>
     );
@@ -154,8 +203,8 @@ function TestSection({
     title,
     tests,
     baseId,
-    generatingTestId,
-    setGeneratingTestId,
+    selectedTest,
+    setSelectedTest,
     setProgress,
     loadingMessage,
     setLoadingMessage,
@@ -165,8 +214,8 @@ function TestSection({
     title: string;
     tests: Test[];
     baseId: string;
-    generatingTestId: number | null;
-    setGeneratingTestId: (id: number | null) => void;
+    selectedTest: Test | null;
+    setSelectedTest: (test: Test | null) => void;
     setProgress: (progress: number) => void;
     loadingMessage: string;
     setLoadingMessage: (message: string) => void;
@@ -194,8 +243,8 @@ function TestSection({
                                 key={test.testId}
                                 test={test}
                                 baseId={baseId}
-                                generatingTestId={generatingTestId}
-                                setGeneratingTestId={setGeneratingTestId}
+                                selectedTest={selectedTest}
+                                setSelectedTest={setSelectedTest}
                                 setProgress={setProgress}
                                 messageLoopRef={messageLoopRef}
                                 loadingMessage={loadingMessage}
@@ -216,8 +265,8 @@ function TestSection({
 function TestCard({
     test,
     baseId,
-    generatingTestId,
-    setGeneratingTestId,
+    selectedTest,
+    setSelectedTest,
     setProgress,
     messageLoopRef,
     loadingMessage,
@@ -226,8 +275,8 @@ function TestCard({
 }: {
     test: any;
     baseId: string;
-    generatingTestId: number | null;
-    setGeneratingTestId: (id: number | null) => void;
+    selectedTest: Test | null;
+    setSelectedTest: (test: Test | null) => void;
     setProgress: (progress: number) => void;
     messageLoopRef: React.RefObject<NodeJS.Timeout | null>;
     loadingMessage: string;
@@ -253,15 +302,15 @@ function TestCard({
         return id;
     }
 
-    const handleGenerate = (testId: string) => {
-        setGeneratingTestId(Number(testId));
+    const handleGenerate = (test: Test) => {
+        setSelectedTest(test);
 
         toast.info(
             "Starting test generation. This may take a few moments... Don't refresh the page!"
         );
 
         const eventSource = new EventSource(
-            `/api/test/stream/generate?testId=${encodeURIComponent(testId)}`
+            `/api/test/stream/generate?testId=${encodeURIComponent(test.testId)}`
         );
 
         eventSource.onmessage = (event) => {
@@ -336,8 +385,8 @@ function TestCard({
                         );
 
 
-                        markTestAsGive(Number(testId));
-                        setGeneratingTestId(null);
+                        markTestAsGive(Number(data.testId));
+                        setSelectedTest(null);
 
                         router.refresh();
 
@@ -360,7 +409,7 @@ function TestCard({
                             "Test generation failed."
                         );
 
-                        setGeneratingTestId(null);
+                        setSelectedTest(null);
 
                         break;
                 }
@@ -388,7 +437,7 @@ function TestCard({
                 "Connection to test generator was lost."
             );
 
-            setGeneratingTestId(null);
+            setSelectedTest(null);
         };
     };
 
@@ -467,15 +516,15 @@ function TestCard({
                                 }
                             );
                         }}
-                        disabled={generatingTestId !== null}
+                        disabled={selectedTest !== null}
                         className="bg-blue-700 hover:bg-black text-white cursor-pointer"
                     >
                         GIVE 📝
                     </Button>
                 ) : test.status === 'GENERATE' ? (
                     <Button
-                        onClick={() => handleGenerate(test.testId)}
-                        disabled={generatingTestId !== null}
+                        onClick={() => handleGenerate(test)}
+                        disabled={selectedTest !== null}
                         className="bg-green-700 hover:bg-blue-700 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                         GENERATE 🎯
@@ -492,6 +541,7 @@ function TestCard({
                     </Button>
                 ) : (
                     <Button
+                        onClick={() => setSelectedTest(test)}
                         className={cn("cursor-not-allowed", test.status === 'GENERATING' ? "bg-yellow-500 text-white" : "bg-red-700 text-white")}
                     >
                         {test.status === 'GENERATING'
