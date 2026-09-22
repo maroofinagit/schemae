@@ -31,13 +31,7 @@ interface TestsClientProps {
 
 export default function TestsClient({ data, baseId }: TestsClientProps) {
 
-    const [selectedTest, setSelectedTest] = useState<Test | null>({
-        testId: 0,
-        title: "Test 1",
-        description: "Sample test description",
-        status: 'LOCKED',
-        createdAt: new Date(),
-    });
+    const [selectedTest, setSelectedTest] = useState<Test | null>(null);
     const [newData, setNewData] = useState(data);
     const [progress, setProgress] = useState<number>(0);
     const messageLoopRef = useRef<NodeJS.Timeout | null>(null);
