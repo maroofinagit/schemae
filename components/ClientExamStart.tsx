@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { addYears, format, addMonths, subYears } from 'date-fns';
+import { addYears, format, addMonths, subYears, differenceInDays, differenceInMonths } from 'date-fns';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { createUserExam } from '@/app/actions/action';
-import { generateRoadmap } from '@/app/actions/roadmap';
 import { playError, playNotification } from '@/app/lib/sound';
 import { useUser } from '@/app/context/userContext';
+
 
 export default function ClientExamStart({ exam }: { exam: any }) {
 
@@ -27,6 +27,26 @@ export default function ClientExamStart({ exam }: { exam: any }) {
     const minStartDate = format(subYears(new Date(startDate), 3), 'yyyy-MM-dd');
     const minEndDate = format(addMonths(new Date(startDate), 3), "yyyy-MM-dd");
     const maxEndDate = format(addYears(new Date(startDate), 3), "yyyy-MM-dd");
+
+    const getPreparationDuration = () => {
+        if (!startDate || !endDate) return null;
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const months = differenceInMonths(end, start);
+        const remainingDays = differenceInDays(end, addMonths(start, months));
+
+        if (months === 0) {
+            return `${remainingDays} day${remainingDays !== 1 ? "s" : ""}`;
+        }
+
+        if (remainingDays === 0) {
+            return `${months} month${months !== 1 ? "s" : ""}`;
+        }
+
+        return `${months} month${months !== 1 ? "s" : ""} ${remainingDays} day${remainingDays !== 1 ? "s" : ""}`;
+    };
 
     function startMessageLoop(
         messages: string[],
@@ -290,9 +310,18 @@ export default function ClientExamStart({ exam }: { exam: any }) {
                         <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl border text-center space-y-5">
 
                             <div className="text-sm text-justify tracking-tight text-gray-500 flex flex-col gap-y-2">
+
                                 <span>
-                                    Hey {name?.split(" ")[0] || "there"} ! Your roadmap is being carefully built and may take around <span className="font-bold whitespace-nowrap">5-7</span> minutes as its a big responsible task. The app may seem hanged but it's not, don’t worry it’s still working in the background.
+                                    Hey {name?.split(" ")[0] || "there"} ! Your roadmap is being carefully built for your selected timeline from{" "}
+                                    {format(new Date(startDate), "MMM d, yyyy")}
+                                    {" "}
+                                    to{" "}
+                                    {format(new Date(endDate), "MMM d, yyyy")}{" "}
+                                    ({getPreparationDuration()}) and may take around{" "}
+                                    <span className="font-bold whitespace-nowrap">5-7</span>{" "}
+                                    minutes as its a big responsible task. The app may seem hanged but it's not, don’t worry it’s still working in the background.
                                 </span>
+
                                 <span>
                                     ☕️ Brew yourself a coffee, scroll for a while and let us handle the planning. We’ll let you know with a notification sound as soon as your roadmap is ready.
                                 </span>
@@ -382,43 +411,53 @@ export default function ClientExamStart({ exam }: { exam: any }) {
 
                 {/* 🌿 Center Card */}
                 <div className="relative z-10 w-full max-w-md md:max-w-2xl mx-4">
-
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-300 p-8">
-
+                    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 md:p-8">
 
                         {/* Header */}
-                        <h1 className="md:text-2xl text-lg font-semibold mb-4 text-gray-900 tracking-tight">
-                            {exam.name}
-                        </h1>
-                        <p className="text-gray-700 text-sm md:text-base mt-1 mb-6">
-                            Set your timeline and begin your preparation journey.
-                        </p>
+                        <div className="mb-6">
+                            <h1 className="text-lg md:text-2xl font-semibold text-gray-900 tracking-tight">
+                                {exam.name}
+                            </h1>
+
+                            <div className="mt-2 space-y-2">
+                                <p className="text-sm md:text-base text-gray-600">
+                                    Set your timeline and begin your preparation journey.
+                                </p>
+
+                                <p className="text-xs md:text-sm text-gray-500">
+                                    Minimum 3 months and maximum 3 years.
+                                </p>
+                            </div>
+                        </div>
 
                         {/* Form */}
                         <form onSubmit={handleStartPreparing} className="space-y-5">
 
                             {/* Start Date */}
                             <div>
-                                <label className="block text-xs text-gray-700 mb-1 uppercase tracking-wide">
+                                <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">
                                     Start Date
                                 </label>
+
                                 <input
                                     type="date"
                                     name="start_date"
                                     min={minStartDate}
-                                    max={format(addYears(new Date(), 3), 'yyyy-MM-dd')}
+                                    max={format(addYears(new Date(), 3), "yyyy-MM-dd")}
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 
-                                   focus:ring-2 focus:ring-black focus:bg-white outline-none transition"
+                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800
+                    focus:ring-2 focus:ring-black focus:bg-white focus:border-gray-400
+                    outline-none transition"
                                 />
                             </div>
 
                             {/* End Date */}
                             <div>
-                                <label className="block text-xs text-gray-700 mb-1 uppercase tracking-wide">
-                                    Target Completion
+                                <label className="block text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">
+                                    Target Completion Date
                                 </label>
+
                                 <input
                                     type="date"
                                     name="end_date"
@@ -426,24 +465,53 @@ export default function ClientExamStart({ exam }: { exam: any }) {
                                     max={maxEndDate}
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 
-                                   focus:ring-2 focus:ring-black focus:bg-white outline-none transition"
+                                    className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-800
+                    focus:ring-2 focus:ring-black focus:bg-white focus:border-gray-400
+                    outline-none transition"
                                 />
-                                <p className="text-xs md:text-sm text-gray-700 mt-1">
-                                    Min 3 months • Max 3 years
-                                </p>
+
+                                {/* Preparation Duration */}
+                                {startDate && endDate && (
+                                    <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5">
+
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                                                Preparation Period
+                                            </span>
+
+                                            <span className="text-sm font-semibold text-gray-900">
+                                                {getPreparationDuration()}
+                                            </span>
+                                        </div>
+
+                                        <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-500">
+                                            <span>
+                                                {format(new Date(startDate), "MMM d, yyyy")}
+                                            </span>
+
+                                            <span className="text-gray-400">→</span>
+
+                                            <span>
+                                                {format(new Date(endDate), "MMM d, yyyy")}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
                             </div>
 
                             {/* CTA */}
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 rounded-xl font-semibold 
-                               bg-black text-white 
-                               transition-all duration-300 
-                               hover:bg-emerald-500 hover:text-black 
-                               hover:shadow-lg hover:shadow-emerald-200
-                               active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer mt-4 text-sm md:text-base"
+                                className="w-full py-3 rounded-xl font-semibold
+                bg-black text-white
+                transition-all duration-300
+                hover:bg-emerald-500 hover:text-black
+                hover:shadow-lg hover:shadow-emerald-200
+                active:scale-[0.98]
+                disabled:opacity-60 disabled:cursor-not-allowed
+                cursor-pointer text-sm md:text-base"
                             >
                                 {loading ? "Setting things up..." : "Start Preparing"}
                             </button>
@@ -451,12 +519,11 @@ export default function ClientExamStart({ exam }: { exam: any }) {
                         </form>
 
                         {/* Footer */}
-                        <div className="mt-6 text-center">
-                            <a
-                                href="/onboarding"
-                            >
-                                <Button variant='outline'
-                                    className=' hover:bg-black hover:text-white transition cursor-pointer'
+                        <div className="mt-5 text-center">
+                            <a href="/onboarding">
+                                <Button
+                                    variant="outline"
+                                    className="hover:bg-black hover:text-white transition cursor-pointer"
                                 >
                                     ← Change exam
                                 </Button>
