@@ -379,7 +379,7 @@ function TestCard({
                         );
 
 
-                        markTestAsGive(Number(data.testId));
+                        markTestAsGive(Number(selectedTest?.testId));
                         setSelectedTest(null);
 
                         router.refresh();

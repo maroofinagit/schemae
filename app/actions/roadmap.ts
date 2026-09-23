@@ -68,7 +68,7 @@ export async function generateWithFallback(prompt: string, onProgress: (event: P
                     message: `Generating roadmap with ${model} (Attempt ${attempt}/2)...`,
                     progress: attemptProgress,
                 });
-                
+
                 const response =
                     await ai.models.generateContent({
                         model,
@@ -314,7 +314,7 @@ ${subject.topics.map((topic: any) => `
 
 Roadmap Rules(VERY IMPORTANT):
 
-    1. Every week should contain 2 - 5 tasks depending on difficulty.
+1. Every week should contain 2 - 5 tasks depending on difficulty.
 2. Task descriptions must be ONE SHORT SENTENCE(10 - 20 words maximum).
 3. Do NOT write paragraphs.
 4. Keep titles short(2 - 6 words).
@@ -322,10 +322,19 @@ Roadmap Rules(VERY IMPORTANT):
 6. Phases should group related subjects, not individual topics.
 7. The roadmap should feel like a university course with incremental progression.
 8. Roadmap description will be personalized(3–5 sentences) tailored to the user's profile, goals, current skill level, available time, and target exam. It should explain how this roadmap is specifically designed to help the user achieve their objective.
-    9. Topics must appear in a logical prerequisite order.
+9. Topics must appear in a logical prerequisite order.
 10. Avoid scheduling unrelated difficult topics in the same week.
 11. Reserve the final weeks for revision, mock tests, and weak - topic improvement.
 12. Do not repeat the same topic in multiple tasks unless it is a revision task.
+13. EVERY subject provided in the syllabus MUST be represented in at least one roadmap task.
+14. EVERY topic provided under EVERY subject MUST be covered in at least one roadmap task.
+15. No subject or topic may be completely skipped, even when the preparation duration is short.
+16. Complete syllabus coverage has higher priority than keeping the roadmap minimal. If necessary, combine related topics into the same task rather than omitting them.
+17. Before returning the roadmap, verify that every provided subject and every provided topic has been scheduled.
+18. The roadmap must achieve 100% syllabus coverage before allocating time to revision, mock tests, or weak-topic improvement.
+19. Difficult or lengthy topics may be distributed across multiple weeks, but they must still be explicitly covered.
+20. If multiple closely related topics can reasonably be studied together, they may be included in the same task to ensure complete syllabus coverage within the available preparation duration.
+21. A roadmap is invalid if even one provided subject or topic is missing from the scheduled tasks.
 
 Date Constraints -
 
@@ -915,7 +924,7 @@ Do NOT
                 message: `Your roadmap for ${exam.name} has been generated successfully!`,
                 user_exam_id: user_exam_id,
                 roadmap_id: roadmap.id,
-                type:NotificationType.ROADMAP,
+                type: NotificationType.ROADMAP,
             },
         });
 
